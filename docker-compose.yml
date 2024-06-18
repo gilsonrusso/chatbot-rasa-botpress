@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  botpress:
+    build: ./botpress
+    container_name: botpress
+    environment:
+      - BP_PRODUCTION=true
+      - BP_MODULE_NLU_DUCKLINGURL=http://rasa:8000
+      - BP_MODULE_NLU_LANGUAGESOURCES=[{"endpoint":"http://rasa:5005/model/parse"}]
+    volumes:
+      - ./botpress:/botpress/data
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rasa
+  rasa:
+    build: ./rasa
+    container_name: rasa
+    volumes:
+      - ./rasa:/app
+    ports:
+      - "5005:5005"
+      - "8000:8000"
+    command: ["rasa", "run", "--enable-api", "--cors", "*", "--debug"]
